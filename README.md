@@ -1,70 +1,116 @@
-# Getting Started with Create React App
+[![Netlify Status](https://api.netlify.com/api/v1/badges/2f38eb8b-0c8f-40e3-9d32-185e02d29578/deploy-status)](https://app.netlify.com/sites/chatroulette-tk/deploys)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Chatroulette-style Frontend
 
-## Available Scripts
+This is the frontend part of a Chatroulette-style video chat application built using React, socket.io, and WebRTC. This application provides a live video chatting experience, allowing users to connect randomly with others in a waiting queue. This is made for a music video, to mimic the 2012 version of chatroulette
 
-In the project directory, you can run:
+## Features
 
-### `npm start`
+- **User Registration**: Users provide details like age, gender, country, and nickname to register and enter the chat queue.
+- **Main User Interface**: If the nickname "luke" is used, the user is identified as the main user with special controls such as "Next" to skip users.
+- **WebRTC Video Chat**: Users can video chat with each other through peer-to-peer connections using WebRTC.
+- **Socket.io Integration**: The frontend interacts with the backend using socket.io for real-time communication.
+- **Device Selection**: Users can select their preferred camera, microphone, and speaker devices.
+- **Session Management**: The app keeps the user session alive through periodic "I'm Up" messages to the backend.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Prerequisites
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Make sure you have the following installed:
 
-### `npm test`
+- Node.js (>= 14.x)
+- npm (Node Package Manager) or yarn
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Installation
 
-### `npm run build`
+1. Clone the repository:
+   ```sh
+   git clone <repository-url>
+   cd chatroulette-frontend
+   ```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+2. Install dependencies:
+   ```sh
+   npm install
+   # or
+   yarn install
+   ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+3. Create a `.env` file in the project root and add your backend URL:
+   ```
+   REACT_APP_BACKEND_URL=https://chatroulette.tokiostudio.it
+   ```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+4. Start the development server:
+   ```sh
+   npm start
+   # or
+   yarn start
+   ```
 
-### `npm run eject`
+   The application will be available at `http://localhost:3000`.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## File Structure
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- `src/`
+  - `components/`
+    - **RegistrationForm**: User registration form component.
+    - **WaitingRoom**: Displays waiting state until the user is connected.
+    - **VideoChat**: Main video chat component that includes local and remote video.
+    - **MainUserInterface**: Special interface for the main user (nickname "luke"), allowing them to skip users.
+  - `App.jsx`: Main application component that manages routing between registration, waiting room, and video chat.
+  - `index.js`: Entry point of the application.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Usage
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+- **Registering**: Users must provide their details to register. If the nickname is "luke", the user will have special privileges.
+- **Selecting Devices**: Users can choose their preferred camera, microphone, and speaker from available devices.
+- **Connecting to Others**: Once registered, users are placed in a queue. The main user ("luke") can connect with others and skip between different users.
+- **Video Chat**: When two users are connected, they will have a live video chat through WebRTC.
 
-## Learn More
+## Socket.io Events
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- **Register (`register`)**: Emitted during registration, including age, gender, country, and nickname.
+- **Get User (`get-user`)**: Emitted by the main user to get a random available user from the queue.
+- **I'm Up (`im-up`)**: Periodically emitted to let the backend know that the user is still active.
+- **Send Offer (`send-offer`)**: Sent when initiating a WebRTC offer to connect to another user.
+- **Send Answer (`send-answer`)**: Sent when responding to a WebRTC offer.
+- **Send ICE Candidate (`send-ice-candidate`)**: Sent during the WebRTC handshake process to exchange network information.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Environment Variables
 
-### Code Splitting
+- `REACT_APP_BACKEND_URL`: The URL of the backend server that the frontend communicates with.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## WebRTC Connection Flow
 
-### Analyzing the Bundle Size
+1. **Registration**: The user registers via the socket event `register`.
+2. **Get User**: If the user is "luke", they can call `get-user` to connect with a random guest.
+3. **Offer/Answer Exchange**: The main user initiates a WebRTC offer, and the guest user responds with an answer.
+4. **ICE Candidate Exchange**: ICE candidates are exchanged to establish a stable peer-to-peer connection.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Development
 
-### Making a Progressive Web App
+During development, the app will automatically reload if you make any edits.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## Production Build
 
-### Advanced Configuration
+To create a production build, run:
+```sh
+npm run build
+# or
+yarn build
+```
+This will create an optimized build in the `build` directory, which can be deployed to a web server.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## License
 
-### Deployment
+This project is licensed under the MIT License.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## Contributing
 
-### `npm run build` fails to minify
+Feel free to open issues or submit pull requests for any changes you'd like to make. Contributions are always welcome!
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Troubleshooting
+
+- **Camera or Microphone Issues**: Make sure you allow the browser to access your camera and microphone.
+- **Connection Problems**: Ensure that the backend server is up and reachable at the specified `REACT_APP_BACKEND_URL`.
+- **Cross-Origin Requests**: If you encounter CORS issues, ensure the backend allows requests from the frontend's origin.
