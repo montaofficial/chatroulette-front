@@ -172,57 +172,56 @@ function App() {
     setAppState(isMainUser ? 'mainUser' : 'waiting');
   };
 
-  // WebRTC Setup for initiating or receiving connections
-  const initiateConnection = () => {
-    const peerConnection = new RTCPeerConnection(rtcConfig);
-    peerConnectionRef.current = peerConnection;
-
-    // Add media stream tracks
-    mediaStreamRef.current.getTracks().forEach((track) => {
-      peerConnection.addTrack(track, mediaStreamRef.current);
-    });
-
-    // Handle ICE candidates
-    peerConnection.onicecandidate = (event) => {
-      if (event.candidate && connectedUser) {
-        socket.emit('send-ice-candidate', {
-          toSessionId: connectedUser.sessionId,
-          candidate: event.candidate,
-        });
-      }
-    };
-
-    // Handle remote stream
-    peerConnection.ontrack = (event) => {
-      if (remoteVideoRef.current) {
-        remoteVideoRef.current.srcObject = event.streams[0];
-      }
-    };
-
-    // Create offer if the user is the main user
-    if (isMainUser) {
-      peerConnection.createOffer({
-        iceRestart: true,
-        offerToReceiveAudio: true,
-        offerToReceiveVideo: true
-      }).then((offer) => {
-        return peerConnection.setLocalDescription(offer);
-      }).then(() => {
-        if (connectedUser) {
-          socket.emit('send-offer', { toSessionId: connectedUser.sessionId, offer: peerConnection.localDescription });
-        }
-      }).catch((error) => {
-        console.error('Error creating offer:', error);
-      });
-    }
-  };
-
   useEffect(() => {
     if (connectedUser) {
       console.log('Initiating connection with:', connectedUser);
+      // WebRTC Setup for initiating or receiving connections
+      const initiateConnection = () => {
+        const peerConnection = new RTCPeerConnection(rtcConfig);
+        peerConnectionRef.current = peerConnection;
+
+        // Add media stream tracks
+        mediaStreamRef.current.getTracks().forEach((track) => {
+          peerConnection.addTrack(track, mediaStreamRef.current);
+        });
+
+        // Handle ICE candidates
+        peerConnection.onicecandidate = (event) => {
+          if (event.candidate && connectedUser) {
+            socket.emit('send-ice-candidate', {
+              toSessionId: connectedUser.sessionId,
+              candidate: event.candidate,
+            });
+          }
+        };
+
+        // Handle remote stream
+        peerConnection.ontrack = (event) => {
+          if (remoteVideoRef.current) {
+            remoteVideoRef.current.srcObject = event.streams[0];
+          }
+        };
+
+        // Create offer if the user is the main user
+        if (isMainUser) {
+          peerConnection.createOffer({
+            iceRestart: true,
+            offerToReceiveAudio: true,
+            offerToReceiveVideo: true
+          }).then((offer) => {
+            return peerConnection.setLocalDescription(offer);
+          }).then(() => {
+            if (connectedUser) {
+              socket.emit('send-offer', { toSessionId: connectedUser.sessionId, offer: peerConnection.localDescription });
+            }
+          }).catch((error) => {
+            console.error('Error creating offer:', error);
+          });
+        }
+      };
       initiateConnection();
     }
-  }, [connectedUser]);
+  }, [connectedUser, isMainUser]);
 
   return (
     <div className="main-app">
