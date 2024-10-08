@@ -4,8 +4,9 @@ import React from 'react';
 function Header({onNext}) {
   return (
     <div className="header">
-      <h1 className="header-title">Chatroulette</h1>
+      
       <div className="header-buttons">
+        <button className="header-button">Chatroulette</button>
         <button className="header-button" onClick={()=>{onNext()}}>Next (F2)</button>
         <button className="header-button">Stop (F3)</button>
         <label>
